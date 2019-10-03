@@ -1,17 +1,11 @@
 'use strict';
-const execBuffer = require('exec-buffer');
+const {PassThrough} = require('stream');
 const isCwebpReadable = require('is-cwebp-readable');
 const cwebp = require('cwebp-bin');
+const execa = require('execa');
+const isStream = require('is-stream');
 
-module.exports = (options = {}) => input => {
-	if (!Buffer.isBuffer(input)) {
-		return Promise.reject(new TypeError(`Expected \`input\` to be of type \`Buffer\` but received type \`${typeof input}\``));
-	}
-
-	if (!isCwebpReadable(input)) {
-		return Promise.resolve(input);
-	}
-
+const createCwebpStream = (input, options = {}) => {
 	const args = [
 		'-quiet',
 		'-mt'
@@ -73,14 +67,45 @@ module.exports = (options = {}) => input => {
 		args.push('-metadata', Array.isArray(options.metadata) ? options.metadata.join(',') : options.metadata);
 	}
 
-	args.push('-o', execBuffer.output, execBuffer.input);
-
-	return execBuffer({
-		args,
-		bin: cwebp,
+	const cwebpStream = execa(cwebp, [...args, '-o', '-', '--', '-'], {
+		buffer: options.buffer,
+		encoding: null,
 		input
-	}).catch(error => {
-		error.message = error.stderr || error.message;
-		throw error;
 	});
+
+	return cwebpStream;
+};
+
+module.exports = (options = {}) => input => {
+	if (!Buffer.isBuffer(input)) {
+		return Promise.reject(new TypeError(`Expected \`input\` to be of type \`Buffer\` but received type \`${typeof input}\``));
+	}
+
+	if (!isCwebpReadable(input)) {
+		return Promise.resolve(input);
+	}
+
+	return createCwebpStream(input, Object.assign(options, {buffer: true})).then(({stdout}) => stdout);
+};
+
+module.exports.stream = (options = {}) => input => {
+	if (!isStream.readable(input)) {
+		throw new TypeError(`Expected \`input\` to be of type \`stream.Readable\` but received type \`${typeof input}\``);
+	}
+
+	const cwebpStream = createCwebpStream(input, Object.assign(options, {buffer: false}));
+	const outStream = new PassThrough();
+
+	cwebpStream.on('error', error => {
+		outStream.emit('error', error);
+	});
+
+	cwebpStream.stderr.setEncoding('utf8');
+	cwebpStream.stderr.on('data', data => {
+		outStream.emit('error', data);
+	});
+
+	cwebpStream.stdout.pipe(outStream);
+
+	return outStream;
 };

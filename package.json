@@ -40,12 +40,15 @@
 	],
 	"dependencies": {
 		"cwebp-bin": "^5.0.0",
-		"exec-buffer": "^3.0.0",
-		"is-cwebp-readable": "^3.0.0"
+		"execa": "^1.0.0",
+		"is-cwebp-readable": "^3.0.0",
+		"is-stream": "^2.0.0"
 	},
 	"devDependencies": {
 		"ava": "^0.25.0",
+		"get-stream": "^4.1.0",
 		"is-webp": "^1.0.0",
+		"p-event": "^2.3.1",
 		"pify": "^4.0.0",
 		"xo": "^0.23.0"
 	}

@@ -34,6 +34,22 @@ const imageminWebp = require('imagemin-webp');
 
 Returns a Promise<Buffer> with the optimized image.
 
+#### buffer
+
+Type: `Buffer`
+
+Buffer to optimize.
+
+### imageminWebp.stream(options?)(stream)
+
+Returns a [`stream.Readable`](https://nodejs.org/api/stream.html#stream_readable_streams).
+
+#### stream
+
+Type: `stream.Readable`
+
+Input stream to optimize.
+
 #### options
 
 Type: `object`
@@ -132,9 +148,3 @@ Default: `none`<br>
 Values: `all` `none` `exif` `icc` `xmp`
 
 A list of metadata to copy from the input to the output if present.
-
-#### buffer
-
-Type: `Buffer`
-
-Buffer to optimize.
