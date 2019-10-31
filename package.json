@@ -1,5 +1,5 @@
 {
-	"name": "imagemin-webp",
+	"name": "@yeanzhi/imagemin-webp",
 	"version": "5.1.0",
 	"description": "WebP imagemin plugin",
 	"license": "MIT",
@@ -39,7 +39,7 @@
 		"webp"
 	],
 	"dependencies": {
-		"cwebp-bin": "^5.0.0",
+		"@yeanzhi/cwebp-bin": "^5.0.0",
 		"exec-buffer": "^3.0.0",
 		"is-cwebp-readable": "^3.0.0"
 	},
